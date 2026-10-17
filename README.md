@@ -261,7 +261,7 @@ Enter / 左鍵
 
 ```powershell
 .\build.ps1 -Test              # 88 項邏輯自我測試：JSON、設定、歷史、搜尋、快捷鍵
-.\tests\behavior-test.ps1      # 14 項 UI 行為測試：擷取、去重、刪除、釘選、機密內容
+.\tests\behavior-test.ps1      # 16 項 UI 行為測試：擷取、去重、刪除、釘選、機密內容、點擊外部關閉
 .\tests\paste-test.ps1         # 端到端貼上（Enter）
 .\tests\paste-test.ps1 -Plain  # 端到端純文字貼上（Shift+Enter）
 .\tests\paste-test.ps1 -Rich   # 富文字：保留 HTML 與否

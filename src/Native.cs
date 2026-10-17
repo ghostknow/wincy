@@ -37,6 +37,13 @@ namespace Wincy
         public const int SW_SHOW = 5;
         public const int GA_ROOT = 2;
 
+        public const int VK_LBUTTON = 0x01;
+        public const int VK_RBUTTON = 0x02;
+
+        /// <summary>Bit 0x8000 = currently down; bit 0x0001 = pressed since the last call.</summary>
+        [DllImport("user32.dll")]
+        public static extern short GetAsyncKeyState(int virtualKey);
+
         public const ushort VK_SHIFT = 0x10;
         public const ushort VK_CONTROL = 0x11;
         public const ushort VK_MENU = 0x12;

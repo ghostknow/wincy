@@ -20,6 +20,8 @@ namespace Wincy
         private bool _gearHover;
         private bool _gearPressed;
         private bool _layingOut;
+        private readonly Timer _outsideWatch;
+        private MiniMenu _openMenu;
 
         public MainForm(WincyApp app)
         {
@@ -58,6 +60,36 @@ namespace Wincy
             Controls.Add(_list);
 
             _app.Store.Changed += OnStoreChanged;
+
+            // Windows does not always report a deactivation (raising the popup from a
+            // background process can fail to take the foreground), so also watch for
+            // clicks that land outside the popup.
+            _outsideWatch = new Timer();
+            _outsideWatch.Interval = 80;
+            _outsideWatch.Tick += OnOutsideWatchTick;
+        }
+
+        private void OnOutsideWatchTick(object sender, EventArgs e)
+        {
+            if (!Visible)
+            {
+                _outsideWatch.Stop();
+                return;
+            }
+            // Consume the press-latch even when the click is ours, so a later outside
+            // click is not swallowed by a stale flag.
+            bool left = (Native.GetAsyncKeyState(Native.VK_LBUTTON) & 0x0001) != 0;
+            bool right = (Native.GetAsyncKeyState(Native.VK_RBUTTON) & 0x0001) != 0;
+            if (!left && !right) return;
+            if (_suppressDeactivate) return;
+
+            Point cursor = Cursor.Position;
+            if (RectangleToScreen(ClientRectangle).Contains(cursor)) return;
+            if (_openMenu != null && !_openMenu.IsDisposed)
+            {
+                if (_openMenu.Visible && _openMenu.Bounds.Contains(cursor)) return;
+            }
+            HidePopup();
         }
 
         public HistoryList List
@@ -203,6 +235,11 @@ namespace Wincy
             if (!Visible) Show();
             TopMost = true;
             Activate();
+            // Drop any press that happened before the popup appeared, then start watching.
+            Native.GetAsyncKeyState(Native.VK_LBUTTON);
+            Native.GetAsyncKeyState(Native.VK_RBUTTON);
+            _outsideWatch.Stop();
+            _outsideWatch.Start();
             // Windows refuses activation for a window raised by another process (a script
             // using --show), so force focus the same way pasting does.
             Paster.FocusWindow(Handle);
@@ -228,6 +265,7 @@ namespace Wincy
 
         public void HideForAction()
         {
+            _outsideWatch.Stop();
             _suppressDeactivate = true;
             try
             {
@@ -244,15 +282,13 @@ namespace Wincy
         protected override void OnDeactivate(EventArgs e)
         {
             base.OnDeactivate(e);
-            if (_suppressDeactivate) return;
-            if (!Visible) return;
-            // Delay so a click on a menu or the settings window does not close the popup.
+            if (_suppressDeactivate || !Visible) return;
+            // Small delay so clicking a menu or the settings window does not close the popup.
             try
             {
                 BeginInvoke(new MethodInvoker(delegate
                 {
                     if (_suppressDeactivate || !Visible) return;
-                    if (ActiveForm != null) return;
                     HidePopup();
                 }));
             }
@@ -438,9 +474,11 @@ namespace Wincy
         public void ShowMenu(MiniMenu menu, Point screenPoint)
         {
             _suppressDeactivate = true;
+            _openMenu = menu;
             menu.ClosedAction = delegate
             {
                 _suppressDeactivate = false;
+                _openMenu = null;
                 if (!Visible) return;
                 Activate();
                 _search.Focus();
@@ -645,6 +683,17 @@ namespace Wincy
         {
             base.OnResize(e);
             LayoutUi();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && _outsideWatch != null)
+            {
+                _outsideWatch.Stop();
+                _outsideWatch.Tick -= OnOutsideWatchTick;
+                _outsideWatch.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

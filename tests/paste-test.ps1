@@ -35,7 +35,7 @@ public static class E2E {
     public delegate bool EnumProc(IntPtr hwnd, IntPtr p);
     [DllImport("user32.dll")]
     public static extern bool SetProcessDpiAwarenessContext(IntPtr context);
-    [DllImport("user32.dll")]
+    [DllImport("kernel32.dll")]
     public static extern uint GetCurrentThreadId();
     [DllImport("user32.dll")]
     public static extern bool AttachThreadInput(uint attach, uint attachTo, bool on);

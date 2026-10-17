@@ -103,6 +103,27 @@ Send-UiKeys -Keys '{ENTER}' -DelayMs 800
 $items = Get-Items
 Assert-True ($items.Count -eq $before) 'pasting does not add a duplicate item'
 
+Write-Output '--- dismiss on outside click ---'
+$dismissed = 0
+1..3 | ForEach-Object {
+    Start-Process (Join-Path $root 'dist\Wincy.exe') -ArgumentList '--show' | Out-Null
+    Start-Sleep -Milliseconds 600
+    Invoke-UiClickAt -X 200 -Y 120
+    Start-Sleep -Milliseconds 400
+    if ((Get-UiWindow -Title 'Wincy') -eq [IntPtr]::Zero) { $dismissed++ }
+    else { Send-UiKeys -Keys '{ESC}' -DelayMs 250 }
+}
+Assert-True ($dismissed -eq 3) 'clicking outside the popup hides it (3/3)'
+
+Start-Process (Join-Path $root 'dist\Wincy.exe') -ArgumentList '--show' | Out-Null
+Start-Sleep -Milliseconds 600
+$openPopup = Get-UiWindow -Title 'Wincy'
+$openRect = Get-UiWindowRect -Handle $openPopup
+Invoke-UiClickAt -X ([int](($openRect.Left + $openRect.Right) / 2)) -Y ($openRect.Bottom - 50)
+Start-Sleep -Milliseconds 350
+Assert-True ((Get-UiWindow -Title 'Wincy') -ne [IntPtr]::Zero) 'clicking inside the popup keeps it open'
+Send-UiKeys -Keys '{ESC}' -DelayMs 250
+
 Write-Output ''
 if ($failed -eq 0) { Write-Output "PASS - $passed checks" } else { Write-Output "FAIL - $passed passed, $failed failed" }
 exit $failed
