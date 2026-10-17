@@ -33,8 +33,8 @@ Start-Sleep -Milliseconds 600
 $bitmap.Dispose()
 
 # Two files on the clipboard.
-$tmp = Join-Path $PSScriptRoot 'tmp'
-New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+$tmp = Join-Path $env:ProgramData 'WincyDemo'
+try { New-Item -ItemType Directory -Force -Path $tmp | Out-Null } catch { $tmp = Join-Path $env:TEMP 'WincyDemo'; New-Item -ItemType Directory -Force -Path $tmp | Out-Null }
 $fileA = Join-Path $tmp 'release-notes.pdf'
 $fileB = Join-Path $tmp 'wincy-preview.png'
 [IO.File]::WriteAllText($fileA, "dummy pdf", [Text.Encoding]::UTF8)

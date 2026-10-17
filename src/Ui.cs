@@ -375,8 +375,16 @@ namespace Wincy
 
         public static Bitmap Get(string path, int width, int height)
         {
+            return Get(path, width, height, true);
+        }
+
+        /// <summary>
+        /// Scaled bitmap for a list thumbnail (cover) or a preview (contain, no cropping).
+        /// </summary>
+        public static Bitmap Get(string path, int width, int height, bool cover)
+        {
             if (string.IsNullOrEmpty(path) || width <= 0 || height <= 0) return null;
-            string key = path + "|" + width + "x" + height;
+            string key = path + "|" + width + "x" + height + (cover ? "|cover" : "|contain");
             Bitmap cached;
             if (Cache.TryGetValue(key, out cached)) return cached;
 
@@ -388,8 +396,9 @@ namespace Wincy
                     using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     using (Image source = Image.FromStream(stream, false, false))
                     {
-                        // Cover-fit: fill the row thumbnail and crop the overflow.
-                        float scale = Math.Max(width / (float)source.Width, height / (float)source.Height);
+                        float scale = cover
+                            ? Math.Max(width / (float)source.Width, height / (float)source.Height)
+                            : Math.Min(width / (float)source.Width, height / (float)source.Height);
                         int w = Math.Max(1, (int)Math.Round(source.Width * scale));
                         int h = Math.Max(1, (int)Math.Round(source.Height * scale));
                         Bitmap target = new Bitmap(Math.Max(1, width), Math.Max(1, height), PixelFormat.Format32bppPArgb);

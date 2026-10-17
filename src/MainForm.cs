@@ -12,6 +12,7 @@ namespace Wincy
         private readonly WincyApp _app;
         private readonly SearchBox _search;
         private readonly HistoryList _list;
+        private readonly PreviewPane _preview;
         private Palette _palette;
         private bool _suppressDeactivate;
         private bool _fromTray;
@@ -57,7 +58,12 @@ namespace Wincy
             _list.ApplyPalette(_palette);
             _list.ItemActivated += delegate { ActivateSelected(false, false); };
             _list.ItemContextMenu += delegate { ShowItemMenu(); };
+            _list.SelectionChanged += delegate { UpdatePreview(); };
             Controls.Add(_list);
+
+            _preview = new PreviewPane();
+            _preview.ApplyPalette(_palette);
+            Controls.Add(_preview);
 
             _app.Store.Changed += OnStoreChanged;
 
@@ -122,6 +128,7 @@ namespace Wincy
             _search.ForeColor = palette.Text;
             _search.PlaceholderColor = palette.TextFaint;
             _list.ApplyPalette(palette);
+            _preview.ApplyPalette(palette);
             Invalidate(true);
         }
 
@@ -144,6 +151,12 @@ namespace Wincy
             get { return Dpi.S(40); }
         }
 
+        /// <summary>Width of the history column; the preview fills the rest.</summary>
+        private int ListWidth
+        {
+            get { return Dpi.S(400); }
+        }
+
         private int FooterHeight
         {
             get { return Dpi.S(36); }
@@ -151,7 +164,7 @@ namespace Wincy
 
         private Rectangle SearchRect
         {
-            get { return new Rectangle(Pad, Pad, ClientSize.Width - Pad * 2, SearchHeight); }
+            get { return new Rectangle(Pad, Pad, ListWidth - Pad * 2, SearchHeight); }
         }
 
         private int HeightForContent()
@@ -173,7 +186,7 @@ namespace Wincy
             _layingOut = true;
             try
             {
-                ClientSize = new Size(Dpi.S(420), HeightForContent());
+                ClientSize = new Size(Dpi.S(780), HeightForContent());
 
                 Rectangle pill = SearchRect;
                 _search.Font = Fonts.Ui(11.5f);
@@ -182,8 +195,12 @@ namespace Wincy
                 _search.Bounds = new Rectangle(pill.Left + Dpi.S(34), textTop,
                     pill.Width - Dpi.S(46), textHeight);
 
+                int footerTop = ClientSize.Height - FooterHeight;
                 int listTop = pill.Bottom + Dpi.S(6);
-                _list.Bounds = new Rectangle(0, listTop, ClientSize.Width, ClientSize.Height - listTop - FooterHeight);
+                int columnHeight = Math.Max(Dpi.S(80), footerTop - listTop - Dpi.S(6));
+                _list.Bounds = new Rectangle(0, listTop, ListWidth, columnHeight);
+                _preview.Bounds = new Rectangle(ListWidth + Dpi.S(1), Pad,
+                    Math.Max(Dpi.S(120), ClientSize.Width - ListWidth - Dpi.S(1)), footerTop - Pad - Dpi.S(6));
 
                 int gearSize = Dpi.S(26);
                 _gearRect = new Rectangle(ClientSize.Width - Pad - gearSize,
@@ -387,6 +404,7 @@ namespace Wincy
             {
                 _list.SelectFirst();
             }
+            UpdatePreview();
             Invalidate();
         }
 
@@ -394,6 +412,11 @@ namespace Wincy
         {
             ApplyFilter();
             Invalidate();
+        }
+
+        private void UpdatePreview()
+        {
+            _preview.SetItem(_list.SelectedItem);
         }
 
         private void OnStoreChanged(object sender, EventArgs e)
@@ -578,7 +601,8 @@ namespace Wincy
 
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            _list.HandleWheel(e.Delta);
+            if (_preview.Bounds.Contains(e.Location)) _preview.HandleWheel(e.Delta);
+            else _list.HandleWheel(e.Delta);
             base.OnMouseWheel(e);
         }
 
@@ -653,6 +677,7 @@ namespace Wincy
             using (Pen pen = new Pen(_palette.Separator, 1f))
             {
                 g.DrawLine(pen, Pad, footerTop, ClientSize.Width - Pad, footerTop);
+                g.DrawLine(pen, ListWidth, Pad + SearchHeight + Dpi.S(6), ListWidth, footerTop - Dpi.S(6));
             }
 
             string hints = "Enter " + I18n.T("hint.paste") + "    Shift+Enter " + I18n.T("hint.plain") +

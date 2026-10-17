@@ -47,6 +47,7 @@
 
 - `Ctrl+Shift+V` 在任何應用程式上方開啟歷史清單（可在設定中改；被佔用時自動退回 `Ctrl+Alt+V`）。
 - 打字即搜尋：比對標題、全文、檔名與來源 App，命中字元會高亮。
+- 選取項目時右側即時預覽：完整文字（換行、可捲動）、等比縮放的圖片、檔案清單。
 - `Enter` 貼上、`Shift+Enter` 以純文字貼上、`Ctrl+Enter` 只複製不貼上、`Ctrl+1`–`Ctrl+9` 直接貼上第 N 項。
 - 釘選（`Ctrl+P`）的項目永遠置頂，且不會被歷史數量上限清除。
 - 右鍵選單：貼上 / 純文字貼上 / 複製 / 釘選 / 刪除 / 清除全部。
@@ -74,6 +75,10 @@
 | ![設定](docs/settings-dark.png) | ![淺色](docs/popup-light.png) |
 
 ![關於](docs/about-dark.png)
+
+右側預覽（圖片）：
+
+![預覽](docs/preview-image.png)
 
 ---
 
@@ -128,7 +133,7 @@ python assets\make_icon.py
 | `Esc` | 關閉清單 |
 | 滑鼠左鍵 | 貼上該項目 |
 | 滑鼠右鍵 | 開啟項目選單 |
-| 滾輪 | 捲動清單 |
+| 滾輪 | 捲動清單；在右側預覽上捲動預覽內容 |
 
 系統匣圖示：左鍵開關清單、右鍵開啟選單、雙擊開啟清單。
 
@@ -215,6 +220,7 @@ src/
 ├── WincyApp.cs         ApplicationContext：托盤、監聽器、熱鍵、儲存與視窗的整合
 ├── MainForm.cs         浮動歷史視窗（搜尋框、清單、頁尾、鍵盤操作）
 ├── HistoryList.cs      自繪清單：圖示/縮圖、高亮、hover、選取、自訂捲軸
+├── PreviewPane.cs      右側預覽：自動換行的完整文字、等比縮放的圖片、檔案清單
 ├── SettingsForm.cs     設定視窗（開關、數量調整器、熱鍵錄製、忽略清單）
 ├── InfoForm.cs         「關於」視窗
 ├── MiniMenu.cs         自繪彈出選單（托盤選單、右鍵選單、確認對話框）

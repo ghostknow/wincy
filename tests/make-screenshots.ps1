@@ -59,7 +59,7 @@ Send-WincyCommand '--show'
 $popup = Wait-UiWindow -Title 'Wincy'
 Start-Sleep -Milliseconds 700
 $rect = Get-UiWindowRect -Handle $popup
-Invoke-UiClickAt -X ([int](($rect.Left + $rect.Right) / 2)) -Y ($rect.Top + 126) -Right
+Invoke-UiClickAt -X ($rect.Left + 200) -Y ($rect.Top + 126) -Right
 Start-Sleep -Milliseconds 500
 Save-UiScreenshot -Title 'Wincy Menu' -Path (Join-Path $docs 'context-menu.png')
 Send-UiKeys -Keys '{ESC}' -DelayMs 300

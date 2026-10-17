@@ -49,6 +49,8 @@ tray icon, global hotkey, and a searchable, pinnable clipboard history that past
 - `Ctrl+Shift+V` opens the history list above any application (configurable; if the shortcut is
   taken it falls back to `Ctrl+Alt+V` automatically).
 - Type to search: matches titles, full text, file names and the source app, with hit highlighting.
+- The focused item is previewed on the right: full text (wrapped, scrollable), a fitted image,
+  or the file list.
 - `Enter` pastes, `Shift+Enter` pastes as plain text, `Ctrl+Enter` only copies, `Ctrl+1`–`Ctrl+9`
   pastes the Nth item directly.
 - Pinned items (`Ctrl+P`) always stay on top and are never removed by the history limit.
@@ -78,6 +80,10 @@ tray icon, global hotkey, and a searchable, pinnable clipboard history that past
 | ![Settings](docs/settings-dark.png) | ![Light](docs/popup-light.png) |
 
 ![About](docs/about-dark.png)
+
+Image preview (right-hand pane):
+
+![Preview](docs/preview-image.png)
 
 ---
 
@@ -132,7 +138,7 @@ python assets\make_icon.py
 | `Esc` | Close the list |
 | Left click | Paste that item |
 | Right click | Open the item menu |
-| Wheel | Scroll the list |
+| Wheel | Scroll the list; scrolls the preview when the pointer is over it |
 
 Tray icon: left click toggles the list, right click opens the menu, double click opens the list.
 
@@ -220,6 +226,7 @@ src/
 ├── WincyApp.cs         ApplicationContext: wires the tray, watcher, hotkey, store and windows together
 ├── MainForm.cs         Floating history window (search box, list, footer, keyboard handling)
 ├── HistoryList.cs      Owner-drawn list: icons/thumbnails, highlighting, hover, selection, custom scrollbar
+├── PreviewPane.cs      Right-hand preview: wrapped full text, fitted image, file list
 ├── SettingsForm.cs     Settings window (toggles, stepper, hotkey recorder, ignore list)
 ├── InfoForm.cs         About window
 ├── MiniMenu.cs         Owner-drawn popup menu (tray menu, context menu, confirmations)

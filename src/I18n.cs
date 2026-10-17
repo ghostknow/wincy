@@ -96,6 +96,8 @@ namespace Wincy
             { "search.placeholder", "搜尋剪貼簿…" },
             { "empty.title", "沒有符合的項目" },
             { "empty.titleEmpty", "尚無剪貼簿記錄" },
+            { "preview.empty", "選取項目即可預覽內容" },
+            { "preview.files", "{0} 個檔案" },
             { "empty.hint", "複製一些文字、圖片或檔案來開始使用" },
             { "empty.hintSearch", "換個關鍵字再試一次" },
 
@@ -191,6 +193,8 @@ namespace Wincy
             { "search.placeholder", "Search clipboard…" },
             { "empty.title", "No matching items" },
             { "empty.titleEmpty", "No clipboard history yet" },
+            { "preview.empty", "Select an item to preview it" },
+            { "preview.files", "{0} files" },
             { "empty.hint", "Copy some text, an image or files to get started" },
             { "empty.hintSearch", "Try a different search" },
 
