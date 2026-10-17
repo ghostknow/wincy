@@ -1,0 +1,13 @@
+# Build output
+dist/
+tests/_selftest.exe
+tests/_pastetarget.exe
+tests/_pastetarget.out
+tests/shots/
+tests/tmp/
+*.pdb
+*.user
+*.suo
+
+# Local data (portable mode)
+WincyData/
