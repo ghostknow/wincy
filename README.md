@@ -1,5 +1,7 @@
 # Wincy for Windows
 
+**繁體中文** | [English](README.en.md)
+
 把 macOS 上的剪貼簿管理員 [Maccy](https://github.com/p0deje/Maccy) 重寫成原生 Windows 版本，取名 **Wincy**（原名 Maccy for Windows，為了不與原專案混淆而更名）：
 系統匣圖示、全域快捷鍵、可搜尋與釘選的剪貼簿歷史，貼回原本的視窗。
 
@@ -288,11 +290,11 @@ git push -u origin main
 - `.gitignore` 排除 `dist\`、測試產物與 `.pdb`：執行檔以 Release 形式發佈，不進版控。
 - `.gitattributes` 統一換行（`*.ps1`、`*.cs` 為 CRLF），圖片與執行檔標為 binary。
 
-發行版本：
+發行版本（先修改 `src\AssemblyInfo.cs` 的版本號）：
 
 ```powershell
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.0.1
+git push origin v1.0.1
 ```
 
 ## 已知限制
