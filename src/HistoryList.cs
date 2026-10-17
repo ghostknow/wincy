@@ -27,6 +27,7 @@ namespace Wincy
         public event EventHandler SelectionChanged;
         public event EventHandler ItemActivated;
         public event EventHandler ItemContextMenu;
+        public event EventHandler PointerLeft;
 
         public HistoryList()
         {
@@ -127,8 +128,13 @@ namespace Wincy
         public int IndexAtPoint(Point point)
         {
             if (point.X < 0 || point.X >= ClientSize.Width) return -1;
-            if (NeedsScrollbar && point.X >= ClientSize.Width - Dpi.S(12)) return -1;
+            if (IsOverScrollbar(point)) return -1;
             return IndexAtY(point.Y);
+        }
+
+        private bool IsOverScrollbar(Point point)
+        {
+            return NeedsScrollbar && point.X >= ClientSize.Width - Dpi.S(12);
         }
 
         private void RaiseSelectionChanged()
@@ -397,6 +403,13 @@ namespace Wincy
                 Invalidate();
                 RaiseSelectionChanged();
             }
+            else if (index < 0 && _selected >= 0 && !_pressed && !IsOverScrollbar(e.Location))
+            {
+                // The pointer is over padding or empty space: nothing should stay focused.
+                _selected = -1;
+                Invalidate();
+                RaiseSelectionChanged();
+            }
             base.OnMouseMove(e);
         }
 
@@ -408,6 +421,8 @@ namespace Wincy
                 Invalidate();
             }
             Cursor = Cursors.Default;
+            EventHandler handler = PointerLeft;
+            if (handler != null) handler(this, EventArgs.Empty);
             base.OnMouseLeave(e);
         }
 

@@ -139,6 +139,7 @@ python assets\make_icon.py
 | `Ctrl+,` | Open settings |
 | `Esc` | Close the list |
 | Mouse over an item | Focus it and update the preview |
+| Mouse leaves the item | Clear the focus (stays while over the preview pane, so it can be read) |
 | Left click | Paste that item |
 | Right click | Open the item menu |
 | Wheel | Scroll the list; scrolls the preview when the pointer is over it |

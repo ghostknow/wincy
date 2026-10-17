@@ -60,6 +60,7 @@ namespace Wincy
             _list.ItemActivated += delegate { ActivateSelected(false, false); };
             _list.ItemContextMenu += delegate { ShowItemMenu(); };
             _list.SelectionChanged += delegate { UpdatePreview(); };
+            _list.PointerLeft += delegate { OnListPointerLeft(); };
             Controls.Add(_list);
 
             _preview = new PreviewPane();
@@ -441,6 +442,17 @@ namespace Wincy
         private void UpdatePreview()
         {
             _preview.SetItem(_list.SelectedItem);
+        }
+
+        /// <summary>
+        /// Drops the focus when the pointer leaves the list. Moving onto the preview pane keeps
+        /// the selection so the preview can still be read and scrolled.
+        /// </summary>
+        private void OnListPointerLeft()
+        {
+            if (!Visible) return;
+            if (_preview.Bounds.Contains(PointToClient(Cursor.Position))) return;
+            _list.ClearSelection();
         }
 
         private void OnStoreChanged(object sender, EventArgs e)
