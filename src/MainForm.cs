@@ -23,6 +23,7 @@ namespace Wincy
         private bool _layingOut;
         private readonly Timer _outsideWatch;
         private MiniMenu _openMenu;
+        private bool _selectFirstOnFilter = true;
 
         public MainForm(WincyApp app)
         {
@@ -245,8 +246,18 @@ namespace Wincy
         {
             _fromTray = fromTray;
             _query = string.Empty;
-            _search.Text = string.Empty;
-            ApplyFilter();
+            // Opening the popup must not focus an item by itself; only the pointer (or the
+            // keyboard) decides what is focused.
+            _selectFirstOnFilter = false;
+            try
+            {
+                _search.Text = string.Empty;
+                ApplyFilter();
+            }
+            finally
+            {
+                _selectFirstOnFilter = true;
+            }
             LayoutUi();
             PositionAt(anchor);
             if (!Visible) Show();
@@ -260,8 +271,18 @@ namespace Wincy
             // Windows refuses activation for a window raised by another process (a script
             // using --show), so force focus the same way pasting does.
             Paster.FocusWindow(Handle);
+            SelectItemUnderPointer();
             _search.Focus();
             Invalidate(true);
+        }
+
+        /// <summary>Focuses the row under the mouse, if the pointer is over one.</summary>
+        private void SelectItemUnderPointer()
+        {
+            if (!Visible) return;
+            int index = _list.IndexAtPoint(_list.PointToClient(Cursor.Position));
+            if (index >= 0) _list.SelectedIndex = index;
+            else _list.ClearSelection();
         }
 
         public void HidePopup()
@@ -389,6 +410,7 @@ namespace Wincy
             if (previous != null) previousId = previous.Id;
 
             _list.SetItems(result, query);
+            bool restored = false;
             if (previousId != null && query.Length > 0)
             {
                 for (int i = 0; i < result.Count; i++)
@@ -396,13 +418,15 @@ namespace Wincy
                     if (result[i].Id == previousId)
                     {
                         _list.SelectIndexSilent(i);
+                        restored = true;
                         break;
                     }
                 }
             }
-            else
+            if (!restored)
             {
-                _list.SelectFirst();
+                if (_selectFirstOnFilter) _list.SelectFirst();
+                else _list.ClearSelection();
             }
             UpdatePreview();
             Invalidate();

@@ -22,6 +22,14 @@ function Start-Wincy {
     Start-Sleep -Seconds 2
 }
 
+function Set-CursorOverFirstRow {
+    param([IntPtr]$Popup)
+    if ($Popup -eq [IntPtr]::Zero) { return }
+    $r = Get-UiWindowRect -Handle $Popup
+    [void][Ui]::SetCursorPos($r.Left + 220, $r.Top + 126)
+    Start-Sleep -Milliseconds 350
+}
+
 function Send-WincyCommand {
     param([string]$Argument)
     Start-Process $wincyExe -ArgumentList $Argument | Out-Null
@@ -47,6 +55,7 @@ Start-Sleep -Milliseconds 500
 Send-WincyCommand '--show'
 Wait-UiWindow -Title 'Wincy' | Out-Null
 Start-Sleep -Milliseconds 600
+Set-CursorOverFirstRow -Popup (Get-UiWindow -Title 'Wincy')
 Save-UiScreenshot -Title 'Wincy' -Path (Join-Path $docs 'popup-dark.png')
 
 $popup = Get-UiWindow -Title 'Wincy'
@@ -81,6 +90,7 @@ Set-Theme 'light'
 Send-WincyCommand '--show'
 Wait-UiWindow -Title 'Wincy' | Out-Null
 Start-Sleep -Milliseconds 700
+Set-CursorOverFirstRow -Popup (Get-UiWindow -Title 'Wincy')
 Save-UiScreenshot -Title 'Wincy' -Path (Join-Path $docs 'popup-light.png')
 Send-UiKeys -Keys '{ESC}' -DelayMs 300
 

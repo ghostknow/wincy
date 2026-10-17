@@ -56,7 +56,7 @@ Assert-True ($items[0].text -eq 'alpha-one') 'duplicate bubbles to the top'
 
 Write-Output '--- delete ---'
 $beforeDelete = Get-Items
-$expectedRemoved = $beforeDelete[1].text
+$expectedRemoved = $beforeDelete[0].text
 Start-Process (Join-Path $root 'dist\Wincy.exe') -ArgumentList '--show' | Out-Null
 $popup = Wait-UiWindow -Title 'Wincy'
 Assert-True ($popup -ne [IntPtr]::Zero) 'popup opened'

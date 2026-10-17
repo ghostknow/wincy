@@ -71,8 +71,7 @@ namespace Wincy
                 _selected = index;
                 EnsureVisible(index);
                 Invalidate();
-                EventHandler handler = SelectionChanged;
-                if (handler != null) handler(this, EventArgs.Empty);
+                RaiseSelectionChanged();
             }
         }
 
@@ -99,7 +98,7 @@ namespace Wincy
             _query = query ?? string.Empty;
             _hover = -1;
             if (_items.Count == 0) _selected = -1;
-            else if (_selected >= _items.Count || _selected < 0) _selected = 0;
+            else if (_selected >= _items.Count) _selected = _items.Count - 1;
             ClampScroll();
             Invalidate();
         }
@@ -107,10 +106,35 @@ namespace Wincy
         public void MoveSelection(int delta)
         {
             if (_items.Count == 0) return;
-            int next = _selected + delta;
+            int next;
+            if (_selected < 0) next = delta >= 0 ? 0 : _items.Count - 1;
+            else next = _selected + delta;
             if (next < 0) next = 0;
             if (next > _items.Count - 1) next = _items.Count - 1;
             SelectedIndex = next;
+        }
+
+        /// <summary>Drops the focus so the list (and the preview) start out empty.</summary>
+        public void ClearSelection()
+        {
+            if (_selected == -1) return;
+            _selected = -1;
+            Invalidate();
+            RaiseSelectionChanged();
+        }
+
+        /// <summary>Row under a client-space point, or -1 for padding, the scrollbar or empty space.</summary>
+        public int IndexAtPoint(Point point)
+        {
+            if (point.X < 0 || point.X >= ClientSize.Width) return -1;
+            if (NeedsScrollbar && point.X >= ClientSize.Width - Dpi.S(12)) return -1;
+            return IndexAtY(point.Y);
+        }
+
+        private void RaiseSelectionChanged()
+        {
+            EventHandler handler = SelectionChanged;
+            if (handler != null) handler(this, EventArgs.Empty);
         }
 
         public void SelectFirst()
@@ -358,12 +382,20 @@ namespace Wincy
 
             if (_pressed && Math.Abs(e.Y - _pressY) > Dpi.S(4)) _movedDuringPress = true;
 
-            int index = IndexAtY(e.Y);
+            int index = IndexAtPoint(e.Location);
             if (index != _hover)
             {
                 _hover = index;
                 Cursor = index >= 0 ? Cursors.Hand : Cursors.Default;
                 Invalidate();
+            }
+            // Follow the pointer: the row under the mouse becomes the focused item, so the
+            // preview always matches what the user is pointing at.
+            if (index >= 0 && index != _selected)
+            {
+                _selected = index;
+                Invalidate();
+                RaiseSelectionChanged();
             }
             base.OnMouseMove(e);
         }

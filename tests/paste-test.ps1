@@ -134,7 +134,10 @@ if ($popup -eq [IntPtr]::Zero) { throw "Wincy popup did not open" }
 Start-Sleep -Milliseconds 350
 
 if (-not $NoPaste) {
-    if ($Plain) { [System.Windows.Forms.SendKeys]::SendWait("+{ENTER}") }
+    # The popup deliberately focuses nothing on open, so move the selection first.
+[System.Windows.Forms.SendKeys]::SendWait("{DOWN}")
+Start-Sleep -Milliseconds 250
+if ($Plain) { [System.Windows.Forms.SendKeys]::SendWait("+{ENTER}") }
     else { [System.Windows.Forms.SendKeys]::SendWait("{ENTER}") }
     Start-Sleep -Milliseconds 1200
 }

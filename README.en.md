@@ -51,6 +51,8 @@ tray icon, global hotkey, and a searchable, pinnable clipboard history that past
 - Type to search: matches titles, full text, file names and the source app, with hit highlighting.
 - The focused item is previewed on the right: full text (wrapped, scrollable), a fitted image,
   or the file list.
+- The popup opens with nothing focused: point at an item (or use the arrow keys) to focus it and
+  update the preview.
 - `Enter` pastes, `Shift+Enter` pastes as plain text, `Ctrl+Enter` only copies, `Ctrl+1`–`Ctrl+9`
   pastes the Nth item directly.
 - Pinned items (`Ctrl+P`) always stay on top and are never removed by the history limit.
@@ -136,6 +138,7 @@ python assets\make_icon.py
 | `Delete` | Delete the selected item (when the search box is empty) |
 | `Ctrl+,` | Open settings |
 | `Esc` | Close the list |
+| Mouse over an item | Focus it and update the preview |
 | Left click | Paste that item |
 | Right click | Open the item menu |
 | Wheel | Scroll the list; scrolls the preview when the pointer is over it |
